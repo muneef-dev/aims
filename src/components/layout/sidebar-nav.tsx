@@ -15,13 +15,6 @@ import {
   LogOut,
   MessageSquare,
   ShieldAlert,
-  Clock,
-  ShoppingCart,
-  Sun,
-  GitCompare,
-  Target,
-  CalendarRange,
-  PieChart,
   Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { monthlySales, forecasts, products } from "@/db/schema";
+import { monthlySales, forecasts } from "@/db/schema";
 import { eq, and, gte } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { generateForecastFromData } from "@/lib/forecasting/engine";

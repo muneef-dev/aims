@@ -51,7 +51,7 @@ function weightedMovingAverage(data: number[]): number {
   return Math.max(0, Math.round(weightedSum / totalWeight));
 }
 
-function calculateConfidence(data: number[], prediction: number): number {
+function calculateConfidence(data: number[]): number {
   if (data.length < 3) return Math.min(40, data.length * 15);
 
   // Calculate R² from linear regression
@@ -106,7 +106,7 @@ export function generateForecastFromData(salesData: MonthlySalesRow[]): Forecast
     modelUsed = "Weighted Moving Average";
   }
 
-  const confidence = calculateConfidence(quantities, prediction);
+  const confidence = calculateConfidence(quantities);
 
   return {
     predictedDemand: prediction,

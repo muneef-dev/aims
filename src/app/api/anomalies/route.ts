@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { anomalies, products, stockUpdates, categories } from "@/db/schema";
+import { anomalies, products, stockUpdates } from "@/db/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { detectAnomalies } from "@/lib/forecasting/anomaly-detection";
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { searchParams } = req.nextUrl;
+  const { searchParams } = new URL(req.url);
   const severity = searchParams.get("severity");
   const acknowledged = searchParams.get("acknowledged");
 
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST — run anomaly detection scan across all active products
-export async function POST(req: NextRequest) {
+export async function POST() {
   const session = await auth();
   if (!session || session.user.role !== "OWNER") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

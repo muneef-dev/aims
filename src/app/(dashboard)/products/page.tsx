@@ -224,7 +224,7 @@ export default function ProductsPage() {
                       className="flex items-center gap-3 font-medium text-primary hover:underline"
                     >
                       {p.imageUrl ? (
-                        <img src={p.imageUrl} alt="" className="h-8 w-8 rounded border object-cover" />
+                        <img src={p.imageUrl} alt={p.name} className="h-8 w-8 rounded border object-cover" loading="lazy" />
                       ) : (
                         <span className="flex h-8 w-8 items-center justify-center rounded border bg-muted text-xs text-muted-foreground">
                           {p.name.charAt(0)}

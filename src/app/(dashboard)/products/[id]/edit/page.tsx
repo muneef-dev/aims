@@ -4,9 +4,28 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProductForm } from "@/components/products/product-form";
 
+interface Product {
+  id: string;
+  name: string;
+  sku: string;
+  categoryId: string | null;
+  description: string | null;
+  unit: string;
+  initialStock: number;
+  currentStock: number;
+  minStockLevel: number;
+  maxStockLevel: number;
+  unitCostPrice: number;
+  unitSellingPrice: number;
+  supplierName: string | null;
+  leadTimeDays: number;
+  imageUrl: string | null;
+  isActive: boolean;
+}
+
 export default function EditProductPage() {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,7 +39,7 @@ export default function EditProductPage() {
     return <p className="text-muted-foreground py-8">Loading…</p>;
   }
 
-  if (!product || product.error) {
+  if (!product) {
     return <p className="text-muted-foreground py-8">Product not found.</p>;
   }
 
@@ -33,7 +52,7 @@ export default function EditProductPage() {
         defaultValues={{
           name: product.name,
           sku: product.sku,
-          categoryId: product.categoryId,
+          categoryId: product.categoryId ?? undefined,
           description: product.description ?? "",
           unit: product.unit,
           minStockLevel: product.minStockLevel,

@@ -48,6 +48,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
             src={value}
             alt="Product"
             className="h-32 w-32 rounded-md border object-cover"
+            loading="lazy"
           />
           <Button
             type="button"

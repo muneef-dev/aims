@@ -117,7 +117,7 @@ export default function ProductDetailPage() {
                 <img
                   src={product.imageUrl}
                   alt={product.name}
-                  className="h-48 w-48 rounded-md border object-cover"
+                  className="h-48 w-48 rounded-md border object-cover" loading="lazy"
                 />
               </CardContent>
             </Card>

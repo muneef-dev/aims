@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { products, users, systemSettings } from "@/db/schema";
-import { eq, and, lte, gt } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { sendEmail } from "@/lib/email/mailer";
 import { weeklyReportEmailHtml } from "@/lib/email/templates";

@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { forecastAccuracy, products, stockUpdates } from "@/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { generateForecastFromData } from "@/lib/forecasting/engine";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST — run forecast accuracy evaluation for completed months
-export async function POST(req: NextRequest) {
+export async function POST() {
   const session = await auth();
   if (!session || session.user.role !== "OWNER") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

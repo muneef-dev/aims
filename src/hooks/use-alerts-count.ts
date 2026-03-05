@@ -5,7 +5,25 @@ import { useEffect, useState, useCallback } from "react";
 export function useAlertsCount() {
   const [count, setCount] = useState(0);
 
-  const fetchCount = useCallback(async () => {
+  useEffect(() => {
+    async function fetchCount() {
+      try {
+        const res = await fetch("/api/alerts/count");
+        if (res.ok) {
+          const data = await res.json();
+          setCount(data.unreadCount);
+        }
+      } catch {
+        // Silently fail — don't block UI for alert count
+      }
+    }
+
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000); // Poll every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const refetch = useCallback(async () => {
     try {
       const res = await fetch("/api/alerts/count");
       if (res.ok) {
@@ -13,15 +31,9 @@ export function useAlertsCount() {
         setCount(data.unreadCount);
       }
     } catch {
-      // Silently fail — don't block UI for alert count
+      // Silently fail
     }
   }, []);
 
-  useEffect(() => {
-    fetchCount();
-    const interval = setInterval(fetchCount, 30000); // Poll every 30 seconds
-    return () => clearInterval(interval);
-  }, [fetchCount]);
-
-  return { count, refetch: fetchCount };
+  return { count, refetch };
 }

@@ -53,11 +53,10 @@ export function ProductForm({ mode, defaultValues, productId }: ProductFormProps
     handleSubmit,
     setValue,
     watch,
-    setError,
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<ProductInput>({
-    resolver: zodResolver(schema as any),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       sku: "",
@@ -153,7 +152,7 @@ export function ProductForm({ mode, defaultValues, productId }: ProductFormProps
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6 max-w-2xl">
+      <form onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-6 max-w-2xl">
         {/* Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Product Name *</Label>
