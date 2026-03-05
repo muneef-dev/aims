@@ -89,7 +89,7 @@ export async function getInventoryContext(): Promise<string> {
   lines.push(`Total active products: ${stats.totalProducts}`);
   lines.push(`Total stock units: ${stats.totalStock}`);
   lines.push(
-    `Total inventory value (cost): $${Number(stats.totalValue).toFixed(2)}`
+    `Total inventory value (cost): LKR ${Number(stats.totalValue).toFixed(2)}`
   );
   lines.push(`Out of stock: ${stats.outOfStock} products`);
   lines.push(`Low stock: ${stats.lowStock} products`);
@@ -114,7 +114,7 @@ export async function getInventoryContext(): Promise<string> {
             : "Normal";
 
     lines.push(
-      `- ${p.name} (SKU: ${p.sku}) | Category: ${p.category} | Stock: ${p.currentStock} ${p.unit} | Min: ${p.minStockLevel} | Max: ${p.maxStockLevel} | Cost: $${p.unitCostPrice} | Sell: $${p.unitSellingPrice} | Supplier: ${p.supplierName ?? "N/A"} | Status: ${status}`
+      `- ${p.name} (SKU: ${p.sku}) | Category: ${p.category} | Stock: ${p.currentStock} ${p.unit} | Min: ${p.minStockLevel} | Max: ${p.maxStockLevel} | Cost: LKR ${p.unitCostPrice} | Sell: LKR ${p.unitSellingPrice} | Supplier: ${p.supplierName ?? "N/A"} | Status: ${status}`
     );
   }
 

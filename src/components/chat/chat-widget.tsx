@@ -14,43 +14,98 @@ interface Message {
 /** Lightweight markdown-to-HTML renderer for bot messages (reports). */
 function renderMarkdown(text: string): string {
   let html = text
-    // Escape HTML entities
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
+  // Markdown tables — process before inline formatting so | pipes aren't mangled
+  html = html.replace(
+    /(?:^(\|.+\|)\n(\|[\s\-:|]+\|)\n((?:\|.+\|\n?)+))/gm,
+    (_match, header: string, _sep: string, body: string) => {
+      const thCells = header
+        .split("|")
+        .filter((c: string) => c.trim())
+        .map(
+          (c: string) =>
+            `<th class="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">${c.trim()}</th>`
+        )
+        .join("");
+      const rows = body
+        .trim()
+        .split("\n")
+        .map(
+          (row: string, i: number) => {
+            const cells = row
+              .split("|")
+              .filter((c: string) => c.trim())
+              .map(
+                (c: string) =>
+                  `<td class="px-3 py-2 text-xs">${c.trim()}</td>`
+              )
+              .join("");
+            return `<tr class="border-t ${i % 2 === 1 ? "bg-muted/40" : ""}">${cells}</tr>`;
+          }
+        )
+        .join("");
+      return `<div class="overflow-x-auto my-3 rounded-lg border"><table class="w-full text-xs"><thead><tr class="bg-muted/70">${thCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+  );
+
   // Headings
-  html = html.replace(/^### (.+)$/gm, '<h4 class="font-semibold text-sm mt-2 mb-1">$1</h4>');
-  html = html.replace(/^## (.+)$/gm, '<h3 class="font-semibold text-sm mt-3 mb-1 border-b pb-1">$1</h3>');
-  html = html.replace(/^# (.+)$/gm, '<h2 class="font-bold text-base mt-2 mb-2">$1</h2>');
+  html = html.replace(
+    /^### (.+)$/gm,
+    '<h4 class="font-semibold text-xs mt-3 mb-1 text-muted-foreground uppercase tracking-wide">$1</h4>'
+  );
+  html = html.replace(
+    /^## (.+)$/gm,
+    '<div class="mt-4 mb-2 flex items-center gap-2"><div class="h-4 w-1 rounded bg-primary"></div><h3 class="font-semibold text-sm">$1</h3></div>'
+  );
+  html = html.replace(
+    /^# (.+)$/gm,
+    '<div class="mb-3 pb-2 border-b"><h2 class="font-bold text-base">$1</h2></div>'
+  );
 
   // Bold and italic
   html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
-  // Markdown tables
+  // Ordered lists  (1.  Item / 2.  Item)
   html = html.replace(
-    /(?:^(\|.+\|)\n(\|[\s\-:|]+\|)\n((?:\|.+\|\n?)+))/gm,
-    (_match, header: string, _sep: string, body: string) => {
-      const thCells = header.split("|").filter((c: string) => c.trim()).map((c: string) => `<th class="px-2 py-1 text-left text-xs font-medium">${c.trim()}</th>`).join("");
-      const rows = body.trim().split("\n").map((row: string) => {
-        const cells = row.split("|").filter((c: string) => c.trim()).map((c: string) => `<td class="px-2 py-1 text-xs">${c.trim()}</td>`).join("");
-        return `<tr class="border-t">${cells}</tr>`;
-      }).join("");
-      return `<div class="overflow-x-auto my-2"><table class="w-full text-xs border rounded"><thead><tr class="bg-muted">${thCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
-    }
+    /^(\d+)\.\s+(.+)$/gm,
+    '<li class="ml-5 text-xs list-decimal leading-relaxed" value="$1">$2</li>'
+  );
+  html = html.replace(
+    /((?:<li class="ml-5 text-xs list-decimal[^"]*"[^>]*>.*<\/li>\n?)+)/g,
+    '<ol class="my-2 space-y-1">$1</ol>'
   );
 
-  // Unordered lists
-  html = html.replace(/^[\-\*] (.+)$/gm, '<li class="ml-4 text-xs list-disc">$1</li>');
-  html = html.replace(/((?:<li[^>]*>.*<\/li>\n?)+)/g, '<ul class="my-1">$1</ul>');
+  // Unordered lists  (- Item / * Item)
+  html = html.replace(
+    /^[\-\*]\s+(.+)$/gm,
+    '<li class="ml-5 text-xs list-disc leading-relaxed">$1</li>'
+  );
+  html = html.replace(
+    /((?:<li class="ml-5 text-xs list-disc[^"]*">.*<\/li>\n?)+)/g,
+    '<ul class="my-2 space-y-1">$1</ul>'
+  );
 
-  // Line breaks (only for non-HTML lines)
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr class="my-3 border-border"/>');
+
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code class="rounded bg-muted px-1 py-0.5 text-[11px] font-mono">$1</code>');
+
+  // Line breaks
   html = html.replace(/\n/g, "<br/>");
   // Clean up excessive breaks after block elements
   html = html.replace(/(<\/h[234]>)<br\/>/g, "$1");
-  html = html.replace(/(<\/ul>)<br\/>/g, "$1");
   html = html.replace(/(<\/div>)<br\/>/g, "$1");
+  html = html.replace(/(<\/ul>)<br\/>/g, "$1");
+  html = html.replace(/(<\/ol>)<br\/>/g, "$1");
+  html = html.replace(/(<\/table>)<br\/>/g, "$1");
+  html = html.replace(/(<hr[^>]*\/>)<br\/>/g, "$1");
+  // Remove double breaks
+  html = html.replace(/(<br\/>){3,}/g, "<br/><br/>");
 
   return html;
 }
@@ -165,7 +220,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed right-6 bottom-6 z-50 flex h-[500px] w-[380px] flex-col rounded-xl border bg-background shadow-2xl">
+    <div className="fixed right-6 bottom-6 z-50 flex h-[550px] w-[420px] flex-col rounded-xl border bg-background shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-xl border-b bg-primary px-4 py-3 text-primary-foreground">
         <div className="flex items-center gap-2">
@@ -194,15 +249,17 @@ export function ChatWidget() {
               </div>
             )}
             <div
-              className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${
+              className={`rounded-lg px-3 py-2 text-sm ${
                 msg.role === "user"
-                  ? "bg-primary text-primary-foreground whitespace-pre-wrap"
-                  : "bg-muted text-foreground"
+                  ? "max-w-[75%] bg-primary text-primary-foreground whitespace-pre-wrap"
+                  : isReport(msg.text)
+                    ? "max-w-[95%] bg-muted/60 text-foreground border"
+                    : "max-w-[75%] bg-muted text-foreground"
               }`}
             >
               {msg.role === "model" && isReport(msg.text) ? (
                 <div
-                  className="prose-sm"
+                  className="report-content"
                   dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.text) }}
                 />
               ) : (
