@@ -30,6 +30,7 @@ export async function GET() {
     .orderBy(products.name);
 
   const buffer = await renderToBuffer(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createElement(InventoryReportDocument, { products: data }) as any
   );
 
