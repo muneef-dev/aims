@@ -220,7 +220,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed right-6 bottom-6 z-50 flex h-[550px] w-[420px] flex-col rounded-xl border bg-background shadow-2xl">
+    <div className="fixed right-6 bottom-6 z-50 flex h-137.5 w-105 flex-col rounded-xl border bg-background shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-xl border-b bg-primary px-4 py-3 text-primary-foreground">
         <div className="flex items-center gap-2">
