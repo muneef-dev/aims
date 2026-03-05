@@ -23,10 +23,12 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   Activity,
+  ShoppingCart,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Button } from "@/components/ui/button";
+import { QuickSaleDialog } from "@/components/products/quick-sale-dialog";
 import type { DashboardSummary } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { format } from "date-fns";
@@ -48,6 +50,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [quickSaleOpen, setQuickSaleOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -87,8 +90,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Date Range Picker */}
+      {/* Header with Quick Sale & Date Range */}
       <div className="flex items-center gap-3 flex-wrap">
+        <Button onClick={() => setQuickSaleOpen(true)}>
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          Quick Sale
+        </Button>
+        <div className="flex-1" />
         <DateRangePicker value={dateRange} onChange={setDateRange} />
         {dateRange?.from && (
           <Button variant="ghost" size="sm" onClick={() => setDateRange(undefined)}>
@@ -258,6 +266,13 @@ export default function DashboardPage() {
           Last updated: {formatDate(fetchedAt)}
         </p>
       )}
+
+      {/* Quick Sale Dialog */}
+      <QuickSaleDialog
+        open={quickSaleOpen}
+        onOpenChange={setQuickSaleOpen}
+        onSaleComplete={load}
+      />
     </div>
   );
 }
